@@ -15,3 +15,7 @@ span {
 .navbar-brand {
     font-size: xx-large;
 }
+
+#forecastRow {
+    color: white;
+}
