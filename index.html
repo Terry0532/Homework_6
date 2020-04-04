@@ -17,7 +17,7 @@
         <p class="navbar-brand mb-0 h1 text-light">Weather Dashboard</p>
     </nav>
 
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-md-4 bg-light mt-2">
                 <p class="font-weight-bold">Search for a City:</p>
@@ -28,16 +28,41 @@
                     </div>
                 </div>
                 <div class="card mb-3 d-none">
-                    <ul class="list-group list-group-flush" id="searchHistory">
-                        <li class="list-group-item">Cras justo odio</li>
-                    </ul>
+                    <ul class="list-group list-group-flush" id="searchHistory"></ul>
                 </div>
             </div>
             <div class="col-md-8 mt-2">
                 <div class="card mb-3 mt-1 d-none">
                     <div class="card-body" id="searchResult"></div>
                 </div>
-                <p class="font-weight-bold">5-Day Forecast:</p>
+                <p class="font-weight-bold d-none" id="forecastText">5-Day Forecast:</p>
+                <div class="row d-none" id="forecastRow">
+                    <div class="col-md">
+                        <div class="card bg-primary forecastCard">
+                            <div class="card-body forecast"></div>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="card bg-primary forecastCard">
+                            <div class="card-body forecast"></div>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="card bg-primary forecastCard">
+                            <div class="card-body forecast"></div>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="card bg-primary forecastCard">
+                            <div class="card-body forecast"></div>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="card bg-primary forecastCard">
+                            <div class="card-body forecast"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
