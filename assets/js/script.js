@@ -156,7 +156,6 @@ function forecast(cityName) {
         url: queryURL,
         method: "GET"
     }).then(function (response) {
-        console.log(response);
         for (i = 7; i < 40; i = i + 8) {
             var forecastCard = "[value=" + i + "]";
             $(forecastCard).empty();
