@@ -39,6 +39,13 @@ $(".btn").on("click", function () {
     });
 });
 
+//press enter/return button to search
+$("#cityName").keypress(function (event) {
+    if (event.keyCode === 13) {
+        $(".btn").click();
+    }
+});
+
 //get city location and print uv index
 function getUV(lat, lon) {
     var queryURL = openWeather + "uvi?lat=" + lat + "&lon=" + lon + apiId;
