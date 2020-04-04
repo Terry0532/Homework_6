@@ -28,16 +28,21 @@ function getUV(lat, lon) {
         var uvColor = $("#uvColor");
         if (uvValue < 3) {
             uvColor.css("background-color", "green");
+            searchResult.append("<p>Low danger from the Sun's UV rays for the average person.</p>");
         } else if (uvValue < 6) {
             uvColor.css("background-color", "yellow");
             uvColor.css("color", "black");
+            searchResult.append("<p>Moderate risk of harm from unprotected Sun exposure.</p>");
         } else if (uvValue < 8) {
             uvColor.css("background-color", "orange");
             uvColor.css("color", "black");
+            searchResult.append("<p>High risk of harm from unprotected Sun exposure. Protection against skin and eye damage is needed.</p>");
         } else if (uvValue < 11) {
             uvColor.css("background-color", "red");
+            searchResult.append("<p>Very high risk of harm from unprotected Sun exposure. Take extra precautions because unprotected skin and eyes will be damaged and can burn quickly.</p>");
         } else if (uvValue > 11) {
             uvColor.css("background-color", "violet");
+            searchResult.append("<p>Extreme risk of harm from unportected Sun exposure. Take all precautions because unprotected skin and eyes can burn in minutes.</p>");
         }
     });
 };
