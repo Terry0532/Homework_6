@@ -11,3 +11,7 @@ span {
     border-radius: 10px;
     color: white;
 }
+
+.navbar-brand {
+    font-size: xx-large;
+}
