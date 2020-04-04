@@ -98,8 +98,6 @@ function getUV(lat, lon) {
     });
 };
 
-$(".forecast").append(moment().format("LL"));
-
 //get city name and print 5 day forecast
 function forecast(cityName) {
     var queryURL = openWeather + "forecast?q=" + cityName + apiId;;
@@ -108,5 +106,13 @@ function forecast(cityName) {
         method: "GET"
     }).then(function (response) {
         console.log(response);
+        for (i = 7; i < 40; i = i + 8) {
+            var forecastCard = "[value=" + i + "]";
+            $(forecastCard).empty();
+            $(forecastCard).append(response.list[i].dt_txt.replace(" 06:00:00", ""));
+            $(forecastCard).append("<p><img src='http://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + ".png' alt='weather icon'></p>");
+            $(forecastCard).append("<p>Temp: " + Math.round((response.list[i].main.temp - 273.15) * 9 / 5 + 32) + " " + String.fromCharCode(176) + "F</p>");
+            $(forecastCard).append("<p>Humidity: " + response.list[i].main.humidity + "%</p>");
+        }
     });
 }
