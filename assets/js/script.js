@@ -3,12 +3,16 @@ var searchHistory = $("#searchHistory");
 var openWeather = "https://api.openweathermap.org/data/2.5/";
 var apiId = "&appid=9726f22214b33db1ab5c46343f311c22";
 
-//add text to navbar and update it every minute
-$("#navbarText").text("Weather Dashboard (" + moment().format("LLL") + ")");
+//show local time
+var localTime = $("<p>");
+localTime.addClass("mb-0 text-right");
+localTime.attr("id", "changeTime");
+localTime.text("Local Time: " + moment().format("LLL"));
+$("#localTime").append(localTime);
 setInterval(function () {
     var currentSecond = moment().second();
     if (currentSecond == 0) {
-        $("#navbarText").text("Weather Dashboard (" + moment().format("LLL") + ")");
+        $("#changeTime").text("Local Time: " + moment().format("LLL"));
     }
 }, 1000);
 
