@@ -1,17 +1,18 @@
 var searchResult = $("#searchResult");
+var searchHistory = $("#searchHistory");
 var openWeather = "https://api.openweathermap.org/data/2.5/";
 var apiId = "&appid=9726f22214b33db1ab5c46343f311c22";
 
 //click search button to get city name from input and print city weather info
 $(".btn").on("click", function () {
+    //get city name from input
     var cityName = $("#cityName").val().trim();
-    var queryURL = openWeather + "weather?&q=" + cityName + apiId;
 
     //add searched city names to a list
-    var searchHistory = $("#searchHistory");
     var addSearchHistory = $("<li>");
     addSearchHistory.addClass("list-group-item");
     addSearchHistory.text(cityName);
+    addSearchHistory.attr("city", cityName);
     searchHistory.prepend(addSearchHistory);
     searchHistory.parent().removeClass("d-none");
     //if history list is too long delete oldest search history
@@ -22,6 +23,26 @@ $(".btn").on("click", function () {
     //empty input box
     $("#cityName").val("");
 
+    printWeatherInfo(cityName);
+});
+
+//press enter/return button to search
+$("#cityName").keypress(function (event) {
+    if (event.keyCode === 13) {
+        $(".btn").click();
+    }
+});
+
+//click on search history to get weather info on that city
+searchHistory.on("click", ".list-group-item", function () {
+    console.log($(this).attr("city"));
+    // $("#cityName").val($(this).attr("city"));
+    printWeatherInfo($(this).attr("city"));
+});
+
+//get city name and print the weather
+function printWeatherInfo(cityName) {
+    var queryURL = openWeather + "weather?&q=" + cityName + apiId;
     $.ajax({
         url: queryURL,
         method: "GET"
@@ -37,14 +58,7 @@ $(".btn").on("click", function () {
         $("#forecastRow").removeClass("d-none");
         forecast(cityName);
     });
-});
-
-//press enter/return button to search
-$("#cityName").keypress(function (event) {
-    if (event.keyCode === 13) {
-        $(".btn").click();
-    }
-});
+}
 
 //get city location and print uv index
 function getUV(lat, lon) {
