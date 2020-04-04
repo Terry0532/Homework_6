@@ -3,6 +3,15 @@ var searchHistory = $("#searchHistory");
 var openWeather = "https://api.openweathermap.org/data/2.5/";
 var apiId = "&appid=9726f22214b33db1ab5c46343f311c22";
 
+//add text to navbar and update it every minute
+$("#navbarText").text("Weather Dashboard (" + moment().format("LLL") + ")");
+setInterval(function () {
+    var currentSecond = moment().second();
+    if (currentSecond == 0) {
+        $("#navbarText").text("Weather Dashboard (" + moment().format("LLL") + ")");
+    }
+}, 1000);
+
 //click search button to get city name from input and print city weather info
 $(".btn").on("click", function () {
     //get city name from input
@@ -35,8 +44,6 @@ $("#cityName").keypress(function (event) {
 
 //click on search history to get weather info on that city
 searchHistory.on("click", ".list-group-item", function () {
-    console.log($(this).attr("city"));
-    // $("#cityName").val($(this).attr("city"));
     printWeatherInfo($(this).attr("city"));
 });
 
@@ -49,7 +56,7 @@ function printWeatherInfo(cityName) {
     }).then(function (response) {
         searchResult.empty();
         searchResult.parent().removeClass("d-none");
-        searchResult.append("<h5>" + response.name + " (" + moment().format("LL") + ")<img src='http://openweathermap.org/img/wn/" + response.weather[0].icon + ".png' alt='weather icon'></h5>");
+        searchResult.append("<h5>" + response.name + " (" + moment().utc().add(response.timezone, 'seconds').format("LLL") + ")<img src='http://openweathermap.org/img/wn/" + response.weather[0].icon + ".png' alt='weather icon'></h5>");
         searchResult.append("<p>Temperature: " + Math.round((response.main.temp - 273.15) * 9 / 5 + 32) + " " + String.fromCharCode(176) + "F</p>");
         searchResult.append("<p>Humidity: " + response.main.humidity + "%</p>");
         searchResult.append("<p>Wind Speed: " + response.wind.speed + " MPH</p>");
