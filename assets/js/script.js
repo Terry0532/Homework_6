@@ -16,33 +16,51 @@ setInterval(function () {
     }
 }, 1000);
 
-//click search button to get city name from input and print city weather info
-$(".btn").on("click", function () {
+//click search button
+$("#searchButton").on("click", function () {
     //get city name from input
     var cityName = $("#cityName").val().trim();
 
-    //add searched city names to a list
-    var addSearchHistory = $("<li>");
-    addSearchHistory.addClass("list-group-item");
-    addSearchHistory.text(cityName);
-    addSearchHistory.attr("city", cityName);
-    searchHistory.prepend(addSearchHistory);
-    searchHistory.parent().removeClass("d-none");
-    //if history list is too long delete oldest search history
-    if (document.getElementById("searchHistory").getElementsByTagName("li").length == 10) {
-        searchHistory.find(":last-child").remove();
-    }
+    //add city to search history
+    addCityToSearchHistory(cityName);
 
     //empty input box
     $("#cityName").val("");
 
+    //print weather info
     printWeatherInfo(cityName);
 });
 
 //press enter/return button to search
 $("#cityName").keypress(function (event) {
     if (event.keyCode === 13) {
-        $(".btn").click();
+        $("#searchButton").click();
+    }
+});
+
+//press gps button to get user location's weather
+$("#getLocationButton").on("click", function () {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (response) {
+            var queryURL = openWeather + "weather?lat=" + response.coords.latitude + "&lon=" + response.coords.longitude + apiId;
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function (response) {
+                searchResult.empty();
+                searchResult.parent().removeClass("d-none");
+                searchResult.append("<h4>" + response.name + " (" + moment().utc().add(response.timezone, 'seconds').format("LLL") + ")<img src='http://openweathermap.org/img/wn/" + response.weather[0].icon + ".png' alt='weather icon'></h4>");
+                searchResult.append("<p>Temperature: " + Math.round((response.main.temp - 273.15) * 9 / 5 + 32) + " " + String.fromCharCode(176) + "F</p>");
+                searchResult.append("<p>Humidity: " + response.main.humidity + "%</p>");
+                searchResult.append("<p>Wind Speed: " + response.wind.speed + " MPH</p>");
+                getUV(response.coord.lat, response.coord.lon);
+                $("#forecastText").removeClass("d-none");
+                $("#forecastRow").removeClass("d-none");
+                cityName = response.name;
+                addCityToSearchHistory(cityName);
+                forecast(cityName);
+            });
+        });
     }
 });
 
@@ -69,6 +87,20 @@ function printWeatherInfo(cityName) {
         $("#forecastRow").removeClass("d-none");
         forecast(cityName);
     });
+}
+
+//add city to search history
+function addCityToSearchHistory(cityName) {
+    var addSearchHistory = $("<li>");
+    addSearchHistory.addClass("list-group-item");
+    addSearchHistory.text(cityName);
+    addSearchHistory.attr("city", cityName);
+    searchHistory.prepend(addSearchHistory);
+    searchHistory.parent().removeClass("d-none");
+    //if history list is too long delete oldest search history
+    if (document.getElementById("searchHistory").getElementsByTagName("li").length == 10) {
+        searchHistory.find(":last-child").remove();
+    }
 }
 
 //get city location and print uv index
@@ -100,7 +132,7 @@ function getUV(lat, lon) {
             searchResult.append("<p>Extreme risk of harm from unportected Sun exposure. Take all precautions because unprotected skin and eyes can burn in minutes.</p>");
         }
     });
-};
+}
 
 //get city name and print 5 day forecast
 function forecast(cityName) {
@@ -113,7 +145,7 @@ function forecast(cityName) {
         for (i = 7; i < 40; i = i + 8) {
             var forecastCard = "[value=" + i + "]";
             $(forecastCard).empty();
-            $(forecastCard).append(response.list[i].dt_txt.replace(" 06:00:00", ""));
+            $(forecastCard).append(response.list[i].dt_txt.split(" ")[0]);
             $(forecastCard).append("<p><img src='http://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + ".png' alt='weather icon'></p>");
             $(forecastCard).append("<p>Temp: " + Math.round((response.list[i].main.temp - 273.15) * 9 / 5 + 32) + " " + String.fromCharCode(176) + "F</p>");
             $(forecastCard).append("<p>Humidity: " + response.list[i].main.humidity + "%</p>");
