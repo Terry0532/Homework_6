@@ -3,6 +3,8 @@ var searchHistory = $("#searchHistory");
 var openWeather = "https://api.openweathermap.org/data/2.5/";
 var apiId = "&appid=9726f22214b33db1ab5c46343f311c22";
 
+checkLocalStorage();
+
 //show local time
 var localTime = $("<p>");
 localTime.addClass("mb-0 text-right");
@@ -20,6 +22,7 @@ setInterval(function () {
 $("#searchButton").on("click", function () {
     //get city name from input
     var cityName = $("#cityName").val().trim();
+    localStorage.setItem("lastSearch", cityName);
 
     //add city to search history
     addCityToSearchHistory(cityName);
@@ -48,16 +51,15 @@ $("#getLocationButton").on("click", function () {
                 method: "GET"
             }).then(function (response) {
                 searchResult.empty();
-                searchResult.parent().removeClass("d-none");
+                remove_dnone_class($("#weatherInfo"));
                 searchResult.append("<h4>" + response.name + " (" + moment().utc().add(response.timezone, 'seconds').format("LLL") + ")<img src='http://openweathermap.org/img/wn/" + response.weather[0].icon + ".png' alt='weather icon'></h4>");
                 searchResult.append("<p>Temperature: " + Math.round((response.main.temp - 273.15) * 9 / 5 + 32) + " " + String.fromCharCode(176) + "F</p>");
                 searchResult.append("<p>Humidity: " + response.main.humidity + "%</p>");
                 searchResult.append("<p>Wind Speed: " + response.wind.speed + " MPH</p>");
                 getUV(response.coord.lat, response.coord.lon);
-                $("#forecastText").removeClass("d-none");
-                $("#forecastRow").removeClass("d-none");
                 cityName = response.name;
                 addCityToSearchHistory(cityName);
+                localStorage.setItem("lastSearch", cityName);
                 forecast(cityName);
             });
         });
@@ -69,6 +71,21 @@ searchHistory.on("click", ".list-group-item", function () {
     printWeatherInfo($(this).attr("city"));
 });
 
+//if there is local storage for last search, it will print last searched city's weather info
+function checkLocalStorage() {
+    var previousSearchHistory = localStorage.getItem("lastSearch");
+    if (previousSearchHistory !== null) {
+        printWeatherInfo(previousSearchHistory);
+    }
+}
+
+//remove d-none class to display the content
+function remove_dnone_class(remove) {
+    if (remove.hasClass("d-none")) {
+        remove.removeClass("d-none");
+    }
+}
+
 //get city name and print the weather
 function printWeatherInfo(cityName) {
     var queryURL = openWeather + "weather?&q=" + cityName + apiId;
@@ -77,14 +94,12 @@ function printWeatherInfo(cityName) {
         method: "GET"
     }).then(function (response) {
         searchResult.empty();
-        searchResult.parent().removeClass("d-none");
+        remove_dnone_class($("#weatherInfo"));
         searchResult.append("<h4>" + response.name + " (" + moment().utc().add(response.timezone, 'seconds').format("LLL") + ")<img src='http://openweathermap.org/img/wn/" + response.weather[0].icon + ".png' alt='weather icon'></h4>");
         searchResult.append("<p>Temperature: " + Math.round((response.main.temp - 273.15) * 9 / 5 + 32) + " " + String.fromCharCode(176) + "F</p>");
         searchResult.append("<p>Humidity: " + response.main.humidity + "%</p>");
         searchResult.append("<p>Wind Speed: " + response.wind.speed + " MPH</p>");
         getUV(response.coord.lat, response.coord.lon);
-        $("#forecastText").removeClass("d-none");
-        $("#forecastRow").removeClass("d-none");
         forecast(cityName);
     });
 }
@@ -96,7 +111,7 @@ function addCityToSearchHistory(cityName) {
     addSearchHistory.text(cityName);
     addSearchHistory.attr("city", cityName);
     searchHistory.prepend(addSearchHistory);
-    searchHistory.parent().removeClass("d-none");
+    remove_dnone_class(searchHistory.parent());
     //if history list is too long delete oldest search history
     if (document.getElementById("searchHistory").getElementsByTagName("li").length == 10) {
         searchHistory.find(":last-child").remove();
