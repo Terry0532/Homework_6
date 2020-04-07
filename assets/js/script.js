@@ -2,6 +2,8 @@ var searchResult = $("#searchResult");
 var searchHistory = $("#searchHistory");
 var openWeather = "https://api.openweathermap.org/data/2.5/";
 var apiId = "&appid=9726f22214b33db1ab5c46343f311c22";
+var searchHistoryList;
+var cityName;
 
 checkLocalStorage();
 
@@ -21,7 +23,7 @@ setInterval(function () {
 //click search button
 $("#searchButton").on("click", function () {
     //get city name from input
-    var cityName = $("#cityName").val().trim();
+    cityName = $("#cityName").val().trim();
     localStorage.setItem("lastSearch", cityName);
 
     //add city to search history
@@ -60,7 +62,7 @@ $("#getLocationButton").on("click", function () {
                 cityName = response.name;
                 addCityToSearchHistory(cityName);
                 localStorage.setItem("lastSearch", cityName);
-                forecast(cityName);
+                forecast(response.coord.lat, response.coord.lon);
             });
         });
     }
@@ -100,7 +102,7 @@ function printWeatherInfo(cityName) {
         searchResult.append("<p>Humidity: " + response.main.humidity + "%</p>");
         searchResult.append("<p>Wind Speed: " + response.wind.speed + " MPH</p>");
         getUV(response.coord.lat, response.coord.lon);
-        forecast(cityName);
+        forecast(response.coord.lat, response.coord.lon);
     });
 }
 
@@ -149,20 +151,20 @@ function getUV(lat, lon) {
     });
 }
 
-//get city name and print 5 day forecast
-function forecast(cityName) {
-    var queryURL = openWeather + "forecast?q=" + cityName + apiId;;
+function forecast(lat, lon) {
+    var queryURL = openWeather + "onecall?lat=" + lat + "&lon=" + lon + apiId;
     $.ajax({
         url: queryURL,
         method: "GET"
     }).then(function (response) {
-        for (i = 7; i < 40; i = i + 8) {
+        for (i = 1; i < 6; i++) {
             var forecastCard = "[value=" + i + "]";
             $(forecastCard).empty();
-            $(forecastCard).append(response.list[i].dt_txt.split(" ")[0]);
-            $(forecastCard).append("<p><img src='http://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + ".png' alt='weather icon'></p>");
-            $(forecastCard).append("<p>Temp: " + Math.round((response.list[i].main.temp - 273.15) * 9 / 5 + 32) + " " + String.fromCharCode(176) + "F</p>");
-            $(forecastCard).append("<p>Humidity: " + response.list[i].main.humidity + "%</p>");
+            $(forecastCard).append(moment.unix(response.daily[i].dt).format("LL"));
+            $(forecastCard).append("<p><img src='http://openweathermap.org/img/wn/" + response.daily[i].weather[0].icon + ".png' alt='weather icon'></p>");
+            $(forecastCard).append("<p>Temp: " + Math.round((response.daily[i].temp.day - 273.15) * 9 / 5 + 32) + " " + String.fromCharCode(176) + "F</p>");
+            $(forecastCard).append("<p>Humidity: " + response.daily[i].humidity + "%</p>");
         }
+        console.log(response);
     });
 }
